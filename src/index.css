@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --font-arabic: 'Cairo', system-ui, sans-serif;
+  --font-latin: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-arabic);
+}
+
+[dir="ltr"] body, [dir="ltr"] {
+  font-family: var(--font-latin);
+}
+
+/* Serrated coupon effect borders for promotional cards */
+.serrated-edge-right {
+  position: relative;
+}
+.serrated-edge-right::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -8px;
+  width: 16px;
+  background-image: radial-gradient(circle at 100% 50%, transparent 8px, currentColor 8px);
+  background-size: 16px 20px;
+  background-repeat: repeat-y;
+  pointer-events: none;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(249, 115, 22, 0.6);
+}
+
+/* Print Stylesheet for Official A4 Documents */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  header, footer, nav, button, [class*="print:hidden"] {
+    display: none !important;
+  }
+  #printable-official-document {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 15mm !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+}
+
+/* Smooth infinite marquee keyframes for pure photo strips */
+@keyframes ce-marquee-ltr {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes ce-marquee-rtl {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(50%, 0, 0);
+  }
+}
+
+.ce-marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: ce-marquee-ltr 32s linear infinite;
+}
+
+[dir="rtl"] .ce-marquee-track {
+  animation-name: ce-marquee-rtl;
+}
+
+.ce-marquee-container:hover .ce-marquee-track,
+.ce-marquee-container:active .ce-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ce-marquee-track {
+    animation: none;
+  }
+}
+
