@@ -24,17 +24,17 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   return (
     <div className={`relative shrink-0 flex items-center justify-center ${className}`}>
-      {/* Subtle warm orange/fiery ambient glow underneath */}
+      {/* Royal Purple & Electric Lemon Yellow ambient glow */}
       {showGlow && (
         <div 
-          className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-600/40 via-amber-500/30 to-red-600/30 blur-md -z-10 pointer-events-none transform scale-110"
+          className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#852BEB]/35 via-[#A855F7]/20 to-[#F4E600]/30 blur-md -z-10 pointer-events-none transform scale-110"
           aria-hidden="true"
         />
       )}
       
       <img
         src={CATERING_EGYPT_LOGO}
-        alt={altText}
+        alt={altText === 'Catering Egypt - كاترينج مصر' ? 'BASIT | بسيط' : altText}
         className={`${sizeClasses[size]} object-contain drop-shadow-md select-none transition-transform duration-300 hover:scale-105`}
         loading="eager"
       />

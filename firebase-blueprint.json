@@ -1,0 +1,413 @@
+{
+  "entities": {
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Central governance admin entry granting Central Super Admin or Finance Admin authorization.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "adminLevel": { "type": "string", "enum": ["central_super_admin", "finance_admin"] },
+        "label": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "grantedBy": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "adminLevel", "label", "grantedBy", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Non-PII public/operational user identity and strict RBAC binding.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "role": { "type": "string", "enum": ["visitor", "customer", "merchant_owner", "merchant_staff", "delivery_client", "courier", "opportunity_partner", "finance_admin", "central_super_admin"] },
+        "tenantId": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["active", "pending", "suspended"] },
+        "countryCode": { "type": "string", "enum": ["EG", "AE", "SA", "OM"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "role", "status", "countryCode", "createdAt", "updatedAt"]
+    },
+    "UserPrivateProfile": {
+      "title": "UserPrivateProfile",
+      "description": "Strictly isolated user PII document accessible only by owner or central admin.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "maxLength": 160 },
+        "phone": { "type": "string", "maxLength": 32 },
+        "nationalOrTaxId": { "type": "string", "maxLength": 64 },
+        "address": { "type": "string", "maxLength": 240 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "updatedAt"]
+    },
+    "OnboardingApplication": {
+      "title": "OnboardingApplication",
+      "description": "Partner, merchant, delivery client, courier, or opportunity partner onboarding application requiring central approval.",
+      "type": "object",
+      "properties": {
+        "appId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "applicantUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "targetRole": { "type": "string", "enum": ["merchant_owner", "delivery_client", "courier", "opportunity_partner"] },
+        "entityType": { "type": "string", "enum": ["restaurant", "store", "central_kitchen", "company_factory", "courier_individual", "project_owner", "site_owner"] },
+        "businessName": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "contactName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "phone": { "type": "string", "minLength": 6, "maxLength": 32 },
+        "countryCode": { "type": "string", "enum": ["EG", "AE", "SA", "OM"] },
+        "city": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "commercialRegRef": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "selectedPlanId": { "type": "string", "minLength": 2, "maxLength": 64 },
+        "notes": { "type": "string", "maxLength": 600 },
+        "status": { "type": "string", "enum": ["pending_review", "needs_info", "approved", "rejected"] },
+        "adminComment": { "type": "string", "maxLength": 400 },
+        "reviewedByUid": { "type": "string", "maxLength": 128 },
+        "createdTenantId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["appId", "applicantUid", "targetRole", "entityType", "businessName", "contactName", "phone", "countryCode", "city", "commercialRegRef", "selectedPlanId", "status", "createdAt", "updatedAt"]
+    },
+    "TenantWorkspace": {
+      "title": "TenantWorkspace",
+      "description": "Strictly isolated independent workspace for an approved merchant, restaurant, store, company, or delivery client.",
+      "type": "object",
+      "properties": {
+        "tenantId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "entityType": { "type": "string", "enum": ["restaurant", "store", "central_kitchen", "company_factory", "delivery_client"] },
+        "countryCode": { "type": "string", "enum": ["EG", "AE", "SA", "OM"] },
+        "city": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "commercialRegRef": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "planId": { "type": "string", "minLength": 2, "maxLength": 64 },
+        "customCommissionPct": { "type": "number" },
+        "deliveryEnabled": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["active", "suspended"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["tenantId", "ownerUid", "name", "entityType", "countryCode", "city", "commercialRegRef", "planId", "customCommissionPct", "deliveryEnabled", "status", "createdAt", "updatedAt"]
+    },
+    "TenantMember": {
+      "title": "TenantMember",
+      "description": "Authorized staff member bound strictly to one isolated tenant workspace.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "tenantId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "staffName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "memberRole": { "type": "string", "enum": ["owner", "manager", "staff"] },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "tenantId", "staffName", "memberRole", "active", "createdAt"]
+    },
+    "PublicStorefront": {
+      "title": "PublicStorefront",
+      "description": "Public storefront card without any private financial/commission/PII data.",
+      "type": "object",
+      "properties": {
+        "tenantId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "entityType": { "type": "string", "enum": ["restaurant", "store", "central_kitchen", "company_factory", "delivery_client"] },
+        "countryCode": { "type": "string", "enum": ["EG", "AE", "SA", "OM"] },
+        "city": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "isActive": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["tenantId", "name", "entityType", "countryCode", "city", "isActive", "updatedAt"]
+    },
+    "CatalogItem": {
+      "title": "CatalogItem",
+      "description": "Merchant or kitchen product/meal belonging strictly to a single tenantId.",
+      "type": "object",
+      "properties": {
+        "itemId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "tenantId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "merchantOwnerUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "storeName": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "title": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "category": { "type": "string", "minLength": 2, "maxLength": 64 },
+        "priceEGP": { "type": "number" },
+        "stockQty": { "type": "number" },
+        "isAvailable": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["itemId", "tenantId", "merchantOwnerUid", "storeName", "title", "category", "priceEGP", "stockQty", "isAvailable", "createdAt", "updatedAt"]
+    },
+    "CommercialOrder": {
+      "title": "CommercialOrder",
+      "description": "Commercial order strictly isolated between customerUid and merchantOwnerUid.",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "tenantId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "merchantOwnerUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "customerUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "customerName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "itemsSummary": { "type": "string", "minLength": 2, "maxLength": 500 },
+        "subtotalEGP": { "type": "number" },
+        "platformCommissionEGP": { "type": "number" },
+        "deliveryFeeEGP": { "type": "number" },
+        "netMerchantEGP": { "type": "number" },
+        "needsDelivery": { "type": "boolean" },
+        "dropoffAddress": { "type": "string", "minLength": 3, "maxLength": 240 },
+        "status": { "type": "string", "enum": ["pending_merchant", "accepted_preparing", "ready_for_pickup", "in_delivery", "completed", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["orderId", "tenantId", "merchantOwnerUid", "customerUid", "customerName", "itemsSummary", "subtotalEGP", "platformCommissionEGP", "deliveryFeeEGP", "netMerchantEGP", "needsDelivery", "dropoffAddress", "status", "createdAt", "updatedAt"]
+    },
+    "CourierProfile": {
+      "title": "CourierProfile",
+      "description": "Approved courier driver account and task readiness profile.",
+      "type": "object",
+      "properties": {
+        "courierUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "fullName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "vehicleType": { "type": "string", "enum": ["motorcycle", "car", "chilled_van", "truck"] },
+        "zone": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "isOnline": { "type": "boolean" },
+        "isApproved": { "type": "boolean" },
+        "walletBalanceEGP": { "type": "number" },
+        "completedDeliveries": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["courierUid", "fullName", "vehicleType", "zone", "isOnline", "isApproved", "walletBalanceEGP", "completedDeliveries", "createdAt", "updatedAt"]
+    },
+    "DeliveryRequest": {
+      "title": "DeliveryRequest",
+      "description": "FAYD Delivery dispatch shipment assigned exclusively to one courier and visible only to requester, courier, and admin.",
+      "type": "object",
+      "properties": {
+        "deliveryId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "requesterUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "tenantId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orderId": { "type": "string", "maxLength": 128 },
+        "pickupLocation": { "type": "string", "minLength": 3, "maxLength": 240 },
+        "dropoffLocation": { "type": "string", "minLength": 3, "maxLength": 240 },
+        "packageNote": { "type": "string", "maxLength": 300 },
+        "deliveryFeeEGP": { "type": "number" },
+        "courierShareEGP": { "type": "number" },
+        "platformDeliveryFeeEGP": { "type": "number" },
+        "assignedCourierUid": { "type": "string", "maxLength": 128 },
+        "podConfirmationNote": { "type": "string", "maxLength": 200 },
+        "status": { "type": "string", "enum": ["requested", "assigned", "picked_up", "in_transit", "delivered", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["deliveryId", "requesterUid", "tenantId", "pickupLocation", "dropoffLocation", "deliveryFeeEGP", "courierShareEGP", "platformDeliveryFeeEGP", "assignedCourierUid", "status", "createdAt", "updatedAt"]
+    },
+    "FaydOpportunity": {
+      "title": "FaydOpportunity",
+      "description": "Commercial site or operational project/expertise opportunity requiring explicit commercial terms (no free-resource assumptions).",
+      "type": "object",
+      "properties": {
+        "oppId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "oppKind": { "type": "string", "enum": ["project_expertise", "commercial_site"] },
+        "title": { "type": "string", "minLength": 4, "maxLength": 160 },
+        "category": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "city": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "description": { "type": "string", "minLength": 10, "maxLength": 800 },
+        "commercialTerms": { "type": "string", "minLength": 10, "maxLength": 500 },
+        "costOrInvestmentEGP": { "type": "number" },
+        "freeResourceBlocked": { "type": "boolean" },
+        "approvalStatus": { "type": "string", "enum": ["pending_admin", "approved", "rejected", "closed"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["oppId", "ownerUid", "ownerName", "oppKind", "title", "category", "city", "description", "commercialTerms", "costOrInvestmentEGP", "freeResourceBlocked", "approvalStatus", "createdAt", "updatedAt"]
+    },
+    "UsufructProposal": {
+      "title": "UsufructProposal",
+      "description": "Profit-share partnership proposal under Usufruct system requiring both-party consent and central admin approval before any contract.",
+      "type": "object",
+      "properties": {
+        "proposalId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "opportunityId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "opportunityOwnerUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "proposerUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "proposerName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "proposerProfitPct": { "type": "number" },
+        "siteOwnerProfitPct": { "type": "number" },
+        "platformUsufructPct": { "type": "number" },
+        "termsSummary": { "type": "string", "minLength": 10, "maxLength": 600 },
+        "proposerAgreed": { "type": "boolean" },
+        "siteOwnerAgreed": { "type": "boolean" },
+        "adminApproved": { "type": "boolean" },
+        "contractId": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["awaiting_site_owner", "awaiting_admin", "contract_issued", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["proposalId", "opportunityId", "opportunityOwnerUid", "proposerUid", "proposerName", "proposerProfitPct", "siteOwnerProfitPct", "platformUsufructPct", "termsSummary", "proposerAgreed", "siteOwnerAgreed", "adminApproved", "status", "createdAt", "updatedAt"]
+    },
+    "UsufructContract": {
+      "title": "UsufructContract",
+      "description": "Legally approved Usufruct profit-share contract issued strictly after multi-party consent and Central Admin approval.",
+      "type": "object",
+      "properties": {
+        "contractId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "proposalId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "opportunityId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "opportunityOwnerUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "proposerUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "proposerProfitPct": { "type": "number" },
+        "siteOwnerProfitPct": { "type": "number" },
+        "platformUsufructPct": { "type": "number" },
+        "commercialTerms": { "type": "string", "minLength": 10, "maxLength": 600 },
+        "approvedByAdminUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "contractStatus": { "type": "string", "enum": ["active", "completed", "terminated"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["contractId", "proposalId", "opportunityId", "opportunityOwnerUid", "proposerUid", "proposerProfitPct", "siteOwnerProfitPct", "platformUsufructPct", "commercialTerms", "approvedByAdminUid", "contractStatus", "createdAt", "updatedAt"]
+    },
+    "SubscriptionPlan": {
+      "title": "SubscriptionPlan",
+      "description": "Admin-controlled merchant or corporate subscription package.",
+      "type": "object",
+      "properties": {
+        "planId": { "type": "string", "minLength": 2, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "nameAr": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "nameEn": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "monthlyFeeEGP": { "type": "number" },
+        "orderCommissionPct": { "type": "number" },
+        "deliveryDiscountPct": { "type": "number" },
+        "isActive": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["planId", "nameAr", "nameEn", "monthlyFeeEGP", "orderCommissionPct", "deliveryDiscountPct", "isActive", "updatedAt"]
+    },
+    "CommissionRule": {
+      "title": "CommissionRule",
+      "description": "Central Admin controlled commission & fee engine parameters.",
+      "type": "object",
+      "properties": {
+        "ruleId": { "type": "string", "minLength": 2, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "defaultOrderCommissionPct": { "type": "number" },
+        "defaultDeliveryPlatformPct": { "type": "number" },
+        "defaultCourierSharePct": { "type": "number" },
+        "defaultUsufructPlatformPct": { "type": "number" },
+        "minDeliveryFeeEGP": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ruleId", "defaultOrderCommissionPct", "defaultDeliveryPlatformPct", "defaultCourierSharePct", "defaultUsufructPlatformPct", "minDeliveryFeeEGP", "updatedAt"]
+    },
+    "LedgerSettlement": {
+      "title": "LedgerSettlement",
+      "description": "Financial revenue, commission, subscription, and usufruct share settlement record.",
+      "type": "object",
+      "properties": {
+        "entryId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "sourceType": { "type": "string", "enum": ["order_commission", "delivery_fee", "subscription", "usufruct_share"] },
+        "referenceId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "tenantId": { "type": "string", "maxLength": 128 },
+        "beneficiaryUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "grossAmountEGP": { "type": "number" },
+        "platformRevenueEGP": { "type": "number" },
+        "beneficiaryNetEGP": { "type": "number" },
+        "settlementStatus": { "type": "string", "enum": ["accrued", "settled"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["entryId", "sourceType", "referenceId", "beneficiaryUid", "grossAmountEGP", "platformRevenueEGP", "beneficiaryNetEGP", "settlementStatus", "createdAt", "updatedAt"]
+    },
+    "SecurityAuditLog": {
+      "title": "SecurityAuditLog",
+      "description": "Immutable operational and governance audit trail.",
+      "type": "object",
+      "properties": {
+        "logId": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "actorUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "actionAr": { "type": "string", "minLength": 2, "maxLength": 200 },
+        "actionEn": { "type": "string", "minLength": 2, "maxLength": 200 },
+        "targetCollection": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "targetId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["logId", "actorUid", "actionAr", "actionEn", "targetCollection", "targetId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/admins/{adminUid}": {
+      "schema": { "$ref": "#/entities/AdminRecord" },
+      "description": "Central administrators list."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Non-PII RBAC user profile."
+    },
+    "/users/{userId}/private_profile/{docId}": {
+      "schema": { "$ref": "#/entities/UserPrivateProfile" },
+      "description": "Strictly private PII subcollection."
+    },
+    "/onboarding_applications/{appId}": {
+      "schema": { "$ref": "#/entities/OnboardingApplication" },
+      "description": "Partner, merchant, courier, and opportunity partner onboarding queue."
+    },
+    "/tenants/{tenantId}": {
+      "schema": { "$ref": "#/entities/TenantWorkspace" },
+      "description": "Strictly isolated tenant workspace definitions."
+    },
+    "/tenants/{tenantId}/members/{memberUid}": {
+      "schema": { "$ref": "#/entities/TenantMember" },
+      "description": "Staff membership per isolated tenant workspace."
+    },
+    "/public_storefronts/{tenantId}": {
+      "schema": { "$ref": "#/entities/PublicStorefront" },
+      "description": "Public storefront directory without private financials."
+    },
+    "/catalog_items/{itemId}": {
+      "schema": { "$ref": "#/entities/CatalogItem" },
+      "description": "Tenant catalog products/meals."
+    },
+    "/commercial_orders/{orderId}": {
+      "schema": { "$ref": "#/entities/CommercialOrder" },
+      "description": "Customer commercial orders isolated to buyer, merchant owner, and admin."
+    },
+    "/couriers/{courierUid}": {
+      "schema": { "$ref": "#/entities/CourierProfile" },
+      "description": "Approved courier accounts."
+    },
+    "/delivery_requests/{deliveryId}": {
+      "schema": { "$ref": "#/entities/DeliveryRequest" },
+      "description": "FAYD Delivery dispatch shipments and courier task progression."
+    },
+    "/opportunities/{oppId}": {
+      "schema": { "$ref": "#/entities/FaydOpportunity" },
+      "description": "FAYD Opportunities projects & commercial sites (explicit non-free terms enforced)."
+    },
+    "/usufruct_proposals/{proposalId}": {
+      "schema": { "$ref": "#/entities/UsufructProposal" },
+      "description": "Usufruct profit-share partnership drafts requiring multi-party + admin consent."
+    },
+    "/usufruct_contracts/{contractId}": {
+      "schema": { "$ref": "#/entities/UsufructContract" },
+      "description": "Formal active Usufruct contracts."
+    },
+    "/subscription_plans/{planId}": {
+      "schema": { "$ref": "#/entities/SubscriptionPlan" },
+      "description": "Admin-controlled subscription packages."
+    },
+    "/commission_rules/{ruleId}": {
+      "schema": { "$ref": "#/entities/CommissionRule" },
+      "description": "Admin-controlled platform commission & fee config."
+    },
+    "/ledger_settlements/{entryId}": {
+      "schema": { "$ref": "#/entities/LedgerSettlement" },
+      "description": "Financial revenue & settlement ledger entries."
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/SecurityAuditLog" },
+      "description": "Immutable operational & governance audit log."
+    }
+  }
+}

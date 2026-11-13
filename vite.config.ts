@@ -44,9 +44,24 @@ export default defineConfig(() => {
           ],
         },
         workbox: {
-          maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,jpg}'],
+          // Keep Service Worker precache lean & fast (< 3 MB) so Publish & mobile install never stall on 27 MB of media
+          maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+          globPatterns: ['**/*.{js,css,html,svg,woff2}'],
           runtimeCaching: [
+            {
+              urlPattern: /\.(?:png|jpg|jpeg|webp)$/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'catering-images-cache',
+                expiration: {
+                  maxEntries: 60,
+                  maxAgeSeconds: 60 * 60 * 24 * 30,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
               handler: 'CacheFirst',
@@ -64,21 +79,45 @@ export default defineConfig(() => {
           ],
         },
         devOptions: {
-          enabled: true,
-          type: 'module',
+          // Disable SW in dev preview to avoid blocking iFrame hot updates & live testing
+          enabled: false,
         },
       }),
     ],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(import.meta.dirname, '.'),
+      },
+    },
+    build: {
+      chunkSizeWarningLimit: 900,
+      rolldownOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'vendor-react';
+              }
+              if (id.includes('recharts')) {
+                return 'vendor-charts';
+              }
+              if (id.includes('jspdf') || id.includes('html-to-image')) {
+                return 'vendor-pdf';
+              }
+              if (id.includes('firebase')) {
+                return 'vendor-firebase';
+              }
+              if (id.includes('lucide-react') || id.includes('motion')) {
+                return 'vendor-ui';
+              }
+            }
+          },
+        },
       },
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
       hmr: process.env.DISABLE_HMR !== 'true',
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
   };
 });
-

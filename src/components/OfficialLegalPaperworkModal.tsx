@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { 
   Building2, 
   FileText, 
@@ -18,8 +18,15 @@ import {
   FileBadge,
   Phone,
   MapPin,
-  Lock
+  Lock,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
+import {
+  buildOfficialPdfFilename,
+  exportElementsToA4Pdf,
+  triggerCleanA4Print,
+} from '../lib/pdfExport';
 
 interface OfficialLegalPaperworkModalProps {
   isOpen: boolean;
@@ -38,6 +45,11 @@ export const OfficialLegalPaperworkModal: React.FC<OfficialLegalPaperworkModalPr
 }) => {
   const [activeTab, setActiveTab] = useState<'profile' | 'documents' | 'packaging'>('documents');
   const [selectedDocId, setSelectedDocId] = useState<string>('cr');
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [pdfFeedback, setPdfFeedback] = useState<{ kind: 'error' | 'success'; msg: string } | null>(null);
+  const docCardRef = useRef<HTMLDivElement | null>(null);
+  const profileCardRef = useRef<HTMLDivElement | null>(null);
+  const packagingCardRef = useRef<HTMLDivElement | null>(null);
 
   if (!isOpen) return null;
 
@@ -153,14 +165,91 @@ export const OfficialLegalPaperworkModal: React.FC<OfficialLegalPaperworkModalPr
 
   const activeDoc = OFFICIAL_PAPERS.find(d => d.id === selectedDocId) || OFFICIAL_PAPERS[0];
 
+  const getActivePrintableMeta = () => {
+    if (activeTab === 'profile') {
+      return {
+        element: profileCardRef.current,
+        titleAr: 'التعريف المؤسسي للشركة الوطنية اللوجستية ومجلس الإدارة',
+        titleEn: 'Company Profile & Executive Board',
+        refCode: 'COMPANY-PROFILE',
+      };
+    }
+    if (activeTab === 'packaging') {
+      return {
+        element: packagingCardRef.current,
+        titleAr: 'هوية وشعار الباكينج والتعبئة المعتمد',
+        titleEn: 'Official Packaging & Harvest Identity',
+        refCode: 'PACKAGING-IDENTITY',
+      };
+    }
+    return {
+      element: docCardRef.current,
+      titleAr: activeDoc.titleAr,
+      titleEn: activeDoc.titleEn,
+      refCode: activeDoc.id.toUpperCase(),
+    };
+  };
+
   const handlePrintDoc = () => {
+    setPdfFeedback(null);
+    const target = getActivePrintableMeta();
+    if (!target.element) {
+      setPdfFeedback({
+        kind: 'error',
+        msg: 'تعذر تجهيز المحتوى الحالي للطباعة.',
+      });
+      return;
+    }
     onAddAuditLog(
-      `طباعة واستعراض ورقة رسمية: ${activeDoc.titleAr}`,
-      `Printed Official Document: ${activeDoc.titleEn}`,
-      `تم استعراض وتنزيل المستند الرسمي رقم [${activeDoc.docNumber}] الخاص بالشركة الوطنية اللوجستية.`
+      `طباعة وثيقة رسمية: ${target.titleAr}`,
+      `Printed Official Document: ${target.titleEn}`,
+      `تمت طباعة [${target.refCode}] عبر بوابة A4 المستقلة.`
     );
-    onShowToast(`تم تجهيز ملف ${activeDoc.titleAr} للطباعة.`);
-    window.print();
+    triggerCleanA4Print([target.element]);
+  };
+
+  const handleDownloadDocPdf = async () => {
+    const target = getActivePrintableMeta();
+    if (!target.element) {
+      setPdfFeedback({
+        kind: 'error',
+        msg: 'تعذر تجهيز العنصر النشط لتصدير PDF.',
+      });
+      return;
+    }
+    setIsExportingPdf(true);
+    setPdfFeedback(null);
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const filename = buildOfficialPdfFilename(
+        'OfficialDoc',
+        target.refCode,
+        today
+      );
+      const res = await exportElementsToA4Pdf({
+        pageElements: [target.element],
+        filename,
+      });
+      if (!res.success) {
+        setPdfFeedback({
+          kind: 'error',
+          msg: res.errorMessage || 'تعذر تصدير المستند.',
+        });
+        return;
+      }
+      onAddAuditLog(
+        `تنزيل PDF للوثيقة الرسمية: ${target.titleAr}`,
+        `Downloaded Official Document PDF: ${target.titleEn}`,
+        `تم تنزيل ملف PDF: ${res.filename}`
+      );
+      onShowToast(`تم تنزيل ملف PDF: ${res.filename}`);
+      setPdfFeedback({ kind: 'success', msg: `تم تنزيل الملف: ${res.filename}` });
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : 'تعذر تصدير المستند';
+      setPdfFeedback({ kind: 'error', msg: `فشل التصدير: ${detail}` });
+    } finally {
+      setIsExportingPdf(false);
+    }
   };
 
   return (
@@ -197,8 +286,8 @@ export const OfficialLegalPaperworkModal: React.FC<OfficialLegalPaperworkModalPr
         </div>
 
         {/* Tab Navigation: Profile / Documents Vault / Packaging Emblem */}
-        <div className="px-6 py-2.5 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 overflow-x-auto">
-          <div className="flex items-center gap-2">
+        <div className="px-4 sm:px-6 py-2.5 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 sm:pb-0">
             <button
               onClick={() => setActiveTab('documents')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
@@ -236,14 +325,40 @@ export const OfficialLegalPaperworkModal: React.FC<OfficialLegalPaperworkModalPr
             </button>
           </div>
 
-          <button
-            onClick={handlePrintDoc}
-            className="px-3 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-slate-800 hover:bg-orange-600 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            <span>طباعة المستند الحالي</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              disabled={isExportingPdf}
+              onClick={handleDownloadDocPdf}
+              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+            >
+              {isExportingPdf ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+              <span>{isExportingPdf ? 'جارٍ التصدير...' : 'تنزيل PDF'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handlePrintDoc}
+              className="px-3 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-slate-800 hover:bg-orange-600 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>طباعة A4</span>
+            </button>
+          </div>
         </div>
+
+        {pdfFeedback && (
+          <div
+            className={`px-6 py-2 text-xs font-bold flex items-center gap-2 border-b ${
+              pdfFeedback.kind === 'error'
+                ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-900'
+                : 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900'
+            }`}
+          >
+            {pdfFeedback.kind === 'error' ? <AlertCircle className="w-4 h-4 shrink-0" /> : <CheckCircle2 className="w-4 h-4 shrink-0" />}
+            <span>{pdfFeedback.msg}</span>
+          </div>
+        )}
 
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
@@ -285,7 +400,10 @@ export const OfficialLegalPaperworkModal: React.FC<OfficialLegalPaperworkModalPr
               </div>
 
               {/* Right Active Document High-Resolution Card (7 cols) */}
-              <div className="md:col-span-7 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+              <div
+                ref={docCardRef}
+                className="md:col-span-7 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4"
+              >
                 
                 {/* Document Certificate Header */}
                 <div className="border-b border-slate-200 dark:border-slate-800 pb-3 flex items-start justify-between gap-3">
@@ -367,7 +485,7 @@ export const OfficialLegalPaperworkModal: React.FC<OfficialLegalPaperworkModalPr
 
           {/* TAB 2: COMPANY PROFILE (التعريف الشامل) */}
           {activeTab === 'profile' && (
-            <div className="space-y-5">
+            <div ref={profileCardRef} className="space-y-5 bg-white dark:bg-slate-900 rounded-3xl p-2">
               <div className="p-5 rounded-3xl bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 text-white shadow-xl space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center p-2">
@@ -447,7 +565,7 @@ export const OfficialLegalPaperworkModal: React.FC<OfficialLegalPaperworkModalPr
 
           {/* TAB 3: PACKAGING & BRANDING EMBLEM (شعار الباكينج فقط) */}
           {activeTab === 'packaging' && (
-            <div className="space-y-4 text-center">
+            <div ref={packagingCardRef} className="space-y-4 text-center">
               <div className="p-6 rounded-3xl bg-slate-950 text-white border border-slate-800 shadow-xl space-y-4 max-w-xl mx-auto">
                 <span className="text-xs font-bold text-orange-400 tracking-widest uppercase">
                   الشعار والختم الرسمي للباكينج والتعبئة والمواسم

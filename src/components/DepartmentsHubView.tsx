@@ -315,6 +315,13 @@ export const DepartmentsHubView: React.FC<DepartmentsHubViewProps> = ({
               </button>
             </div>
 
+            {aiInsightsGenerated && (
+              <div className="p-3 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-xs text-emerald-200 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>تمت إعادة احتساب مؤشرات الموسم الشتوي ورمضان محلياً وفق سجلات التعاقدات الحالية.</span>
+              </div>
+            )}
+
             {/* AI Predictions Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-2">
               <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">

@@ -181,26 +181,62 @@ export const Phase1ServicesHub: React.FC<Phase1ServicesHubProps> = ({
   };
 
   const catalogEntries = useMemo(() => {
+    const metadataByItemId: Record<
+      string,
+      {
+        supportsDelivery: boolean;
+        supportsPickup: boolean;
+        popularityRank: number;
+        coverageRank: number;
+      }
+    > = {
+      hs_meal_1: { supportsDelivery: true, supportsPickup: true, popularityRank: 2, coverageRank: 2 },
+      hs_meal_2: { supportsDelivery: true, supportsPickup: true, popularityRank: 5, coverageRank: 2 },
+      ma_meal_1: { supportsDelivery: true, supportsPickup: false, popularityRank: 1, coverageRank: 1 },
+      ma_meal_2: { supportsDelivery: true, supportsPickup: true, popularityRank: 3, coverageRank: 1 },
+      ah_meal_1: { supportsDelivery: true, supportsPickup: false, popularityRank: 4, coverageRank: 3 },
+      ah_meal_2: { supportsDelivery: false, supportsPickup: true, popularityRank: 6, coverageRank: 3 },
+    };
+
     const entries = THREE_CENTRAL_KITCHENS.flatMap((k) =>
-      k.sampleMenuItems.map((m, idx) => ({
-        ...m,
-        kitchenId: k.id,
-        kitchenNameAr: k.nameAr,
-        kitchenNameEn: k.nameEn,
-        locationAr: k.locationAr,
-        locationEn: k.locationEn,
-        categoryTag: idx === 0 ? 'full_meals' : 'breakfast',
-      }))
+      k.sampleMenuItems.map((m, idx) => {
+        const meta = metadataByItemId[m.id] || {
+          supportsDelivery: true,
+          supportsPickup: true,
+          popularityRank: 10,
+          coverageRank: k.isHeadquarters ? 1 : 2,
+        };
+        return {
+          ...m,
+          ...meta,
+          kitchenId: k.id,
+          kitchenNameAr: k.nameAr,
+          kitchenNameEn: k.nameEn,
+          locationAr: k.locationAr,
+          locationEn: k.locationEn,
+          categoryTag: idx === 0 ? 'full_meals' : 'breakfast',
+        };
+      })
     );
 
-    return entries.filter((item) => {
+    const filtered = entries.filter((item) => {
       if (selectedLocationFilter !== 'all' && item.kitchenId !== selectedLocationFilter)
         return false;
       if (selectedCategory !== 'all' && item.categoryTag !== selectedCategory)
         return false;
+      if (fulfillmentFilter === 'delivery' && !item.supportsDelivery) return false;
+      if (fulfillmentFilter === 'pickup' && !item.supportsPickup) return false;
       return true;
     });
-  }, [selectedCategory, selectedLocationFilter]);
+
+    if (sortBy === 'most_ordered') {
+      return [...filtered].sort((a, b) => a.popularityRank - b.popularityRank);
+    }
+    if (sortBy === 'nearest') {
+      return [...filtered].sort((a, b) => a.coverageRank - b.coverageRank);
+    }
+    return filtered;
+  }, [selectedCategory, selectedLocationFilter, fulfillmentFilter, sortBy]);
 
   const currentServiceInfo = TWELVE_SERVICES.find(
     (s) => s.targetSection === activeSection

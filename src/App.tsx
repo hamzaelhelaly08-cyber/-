@@ -21,6 +21,8 @@ import { Phase1HomeView } from './components/Phase1HomeView';
 import { Phase1KitchensView } from './components/Phase1KitchensView';
 import { Phase1ServicesHub, Phase1RfqSubmission } from './components/Phase1ServicesHub';
 import { Phase1CartDrawer, Phase1CartItem } from './components/Phase1CartDrawer';
+import { SplashScreen } from './components/SplashScreen';
+import { AlAinVisitorWorldView } from './components/AlAinVisitorWorldView';
 import {
   Phase1AuthAdminView,
   Phase1ActivityItem,
@@ -42,7 +44,11 @@ import {
   ChefHat,
   ArrowRight,
   ArrowLeft,
+  Sparkles,
+  FileDown,
+  Briefcase,
 } from 'lucide-react';
+import { FaydEcosystemHub } from './components/fayd/FaydEcosystemHub';
 
 function readStoredJson<T>(key: string, fallback: T): T {
   try {
@@ -64,7 +70,8 @@ export default function App() {
     return saved === 'ar';
   });
 
-  // Unified Single-App Navigation State (Starts directly on Home as Visitor — NO blocking login)
+  // Unified Single-App Navigation State (Starts with radiant Splash, then directly Home as Visitor — NO blocking login)
+  const [showSplash, setShowSplash] = useState<boolean>(true);
   const [phase1Country, setPhase1Country] = useState<CountryCode>(() =>
     readStoredJson<CountryCode>('ce_phase1_country', 'EG')
   );
@@ -105,6 +112,7 @@ export default function App() {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isUniversalDocBuilderOpen, setIsUniversalDocBuilderOpen] = useState(false);
   const [universalDocType, setUniversalDocType] = useState<UniversalDocType>('quotation');
+  const [universalDocCompany, setUniversalDocCompany] = useState<string | undefined>(undefined);
   const [isCamelLiverModalOpen, setIsCamelLiverModalOpen] = useState(false);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -183,10 +191,13 @@ export default function App() {
     SUPPORTED_COUNTRIES.find((c) => c.code === phase1Country) || SUPPORTED_COUNTRIES[0];
   const BackIcon = isRtl ? ArrowRight : ArrowLeft;
 
+  const actSeqRef = React.useRef(0);
+
   const logPhase1Action = (actionAr: string, actionEn: string) => {
+    actSeqRef.current += 1;
     setPhase1Activity((prev) => [
       {
-        id: `ACT-${Date.now().toString().slice(-5)}`,
+        id: `ACT-${Date.now().toString().slice(-5)}-${actSeqRef.current}`,
         actionAr,
         actionEn,
         actorRole: phase1Role,
@@ -197,9 +208,10 @@ export default function App() {
   };
 
   const handleAddAuditLog = (actionAr: string, actionEn: string, details: string) => {
+    actSeqRef.current += 1;
     setAuditLogs((prev) => [
       {
-        id: `AUD-${Date.now().toString().slice(-4)}`,
+        id: `AUD-${Date.now().toString().slice(-4)}-${actSeqRef.current}`,
         timestamp: isRtl ? 'الآن' : 'Just now',
         userRole: 'ops_director',
         userName: phase1Role,
@@ -350,6 +362,7 @@ export default function App() {
     return base;
   }, [rfqSubmissions, cartItems.length, isRtl]);
 
+  const isAlAinVisitorSection = phase1Section.startsWith('al_ain_');
   const isServicesSection =
     phase1Section.startsWith('service_') ||
     phase1Section === 'quotation' ||
@@ -357,6 +370,15 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans pb-20 md:pb-6 transition-colors duration-200">
+      {/* Stage 3: Radiant Light-Orange Visitor Splash Screen (Auto-enters or instant skip, no forced login) */}
+      {showSplash && (
+        <SplashScreen
+          lang={langCode}
+          customLogoDataUrl={customLogoDataUrl}
+          onEnterPlatform={() => setShowSplash(false)}
+        />
+      )}
+
       {/* Global Toast */}
       {toastMessage && (
         <div className="fixed bottom-20 md:bottom-6 start-4 sm:start-6 z-50 max-w-md bg-slate-900 dark:bg-slate-800 text-white border border-[#FF6B00] rounded-2xl p-3.5 shadow-2xl flex items-center justify-between gap-3">
@@ -414,6 +436,19 @@ export default function App() {
 
             <button
               type="button"
+              onClick={() => handlePhase1Navigate('al_ain_restaurants')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
+                isAlAinVisitorSection && !activeSubmodule
+                  ? 'bg-[#FF6B00] text-white shadow-xs'
+                  : 'text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-slate-800 hover:text-[#FF6B00]'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{isRtl ? 'عالم ومطاعم العين' : 'Al Ain World'}</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => handlePhase1Navigate('service_meals_offer')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
                 isServicesSection && !activeSubmodule
@@ -440,6 +475,19 @@ export default function App() {
 
             <button
               type="button"
+              onClick={() => handlePhase1Navigate('fayd_ecosystem')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
+                phase1Section === 'fayd_ecosystem' && !activeSubmodule
+                  ? 'bg-[#FF6B00] text-white shadow-xs'
+                  : 'text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-slate-800 hover:text-[#FF6B00]'
+              }`}
+            >
+              <Briefcase className="w-3.5 h-3.5" />
+              <span>{isRtl ? 'منظومة FAYD' : 'FAYD Ecosystem'}</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => handlePhase1Navigate('admin')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
                 (phase1Section === 'admin' || !!activeSubmodule)
@@ -451,6 +499,19 @@ export default function App() {
               <span>{t1.nav.admin}</span>
             </button>
           </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setUniversalDocType('quotation');
+              setUniversalDocCompany(undefined);
+              setIsUniversalDocBuilderOpen(true);
+            }}
+            className="px-3.5 py-1.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-[#FF6B00] text-white text-xs font-extrabold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+          >
+            <FileDown className="w-3.5 h-3.5" />
+            <span>{isRtl ? 'مستندات وعروض PDF' : 'PDF Builder'}</span>
+          </button>
         </div>
       </nav>
 
@@ -481,8 +542,9 @@ export default function App() {
               <RawMaterialsForecastingHub
                 tenants={tenants}
                 isRtl={isRtl}
-                onOpenDocBuilder={(type) => {
+                onOpenDocBuilder={(type, company) => {
                   setUniversalDocType(type || 'quotation');
+                  setUniversalDocCompany(company);
                   setIsUniversalDocBuilderOpen(true);
                 }}
                 onAddAuditLog={handleAddAuditLog}
@@ -495,8 +557,9 @@ export default function App() {
               <DepartmentsHubView
                 isRtl={isRtl}
                 onClose={() => setActiveSubmodule(null)}
-                onOpenDocBuilder={(type) => {
+                onOpenDocBuilder={(type, company) => {
                   setUniversalDocType(type || 'quotation');
+                  setUniversalDocCompany(company);
                   setIsUniversalDocBuilderOpen(true);
                 }}
                 onOpenCamelLiverModal={() => setIsCamelLiverModalOpen(true)}
@@ -540,6 +603,22 @@ export default function App() {
                 customLogoDataUrl={customLogoDataUrl}
                 onUploadLogo={handleUploadOfficialLogo}
                 onNavigateSection={handlePhase1Navigate}
+                onOpenReportPdf={() => setIsPrintModalOpen(true)}
+                onOpenQuotePdf={() => {
+                  setUniversalDocType('quotation');
+                  setUniversalDocCompany(undefined);
+                  setIsUniversalDocBuilderOpen(true);
+                }}
+              />
+            )}
+
+            {isAlAinVisitorSection && (
+              <AlAinVisitorWorldView
+                lang={langCode}
+                activeSection={phase1Section}
+                customLogoDataUrl={customLogoDataUrl}
+                onUploadLogo={handleUploadOfficialLogo}
+                onNavigateSection={handlePhase1Navigate}
               />
             )}
 
@@ -573,6 +652,20 @@ export default function App() {
               />
             )}
 
+            {phase1Section === 'fayd_ecosystem' && (
+              <FaydEcosystemHub
+                lang={langCode}
+                countryCode={phase1Country}
+                onExportContractPdf={(companyTitle) => {
+                  setUniversalDocType('quotation');
+                  setUniversalDocCompany(companyTitle);
+                  setIsUniversalDocBuilderOpen(true);
+                }}
+                onShowToast={showToast}
+                onBackHome={() => handlePhase1Navigate('home')}
+              />
+            )}
+
             {phase1Section === 'admin' && (
               <Phase1AuthAdminView
                 lang={langCode}
@@ -598,6 +691,7 @@ export default function App() {
                   );
                 }}
                 onOpenSubmodule={handleOpenSubmodule}
+                onOpenFaydEcosystem={() => handlePhase1Navigate('fayd_ecosystem')}
                 onBackHome={() => handlePhase1Navigate('home')}
               />
             )}
@@ -618,7 +712,7 @@ export default function App() {
       </footer>
 
       {/* Mobile Bottom Tab Bar (Single Unified Path, <= 64px Height) */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-4 px-1">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-5 px-1">
         <button
           type="button"
           onClick={() => handlePhase1Navigate('home')}
@@ -634,22 +728,35 @@ export default function App() {
 
         <button
           type="button"
-          onClick={() => handlePhase1Navigate('service_meals_offer')}
+          onClick={() => handlePhase1Navigate('al_ain_restaurants')}
           className={`flex flex-col items-center justify-center gap-1 text-[10px] font-black cursor-pointer ${
-            isServicesSection && !activeSubmodule
+            isAlAinVisitorSection && !activeSubmodule
               ? 'text-[#FF6B00]'
               : 'text-slate-600 dark:text-slate-400'
           }`}
         >
-          <UtensilsCrossed className="w-5 h-5" />
-          <span className="truncate">{t1.nav.services}</span>
+          <Sparkles className="w-5 h-5" />
+          <span className="truncate">{isRtl ? 'عالم العين' : 'Al Ain'}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handlePhase1Navigate('fayd_ecosystem')}
+          className={`flex flex-col items-center justify-center gap-1 text-[10px] font-black cursor-pointer ${
+            phase1Section === 'fayd_ecosystem' && !activeSubmodule
+              ? 'text-[#FF6B00]'
+              : 'text-slate-600 dark:text-slate-400'
+          }`}
+        >
+          <Briefcase className="w-5 h-5" />
+          <span className="truncate">FAYD</span>
         </button>
 
         <button
           type="button"
           onClick={() => handlePhase1Navigate('kitchens')}
           className={`flex flex-col items-center justify-center gap-1 text-[10px] font-black cursor-pointer ${
-            phase1Section === 'kitchens' && !activeSubmodule
+            (phase1Section === 'kitchens' || isServicesSection) && !activeSubmodule
               ? 'text-[#FF6B00]'
               : 'text-slate-600 dark:text-slate-400'
           }`}
@@ -720,6 +827,7 @@ export default function App() {
         onClose={() => setIsUniversalDocBuilderOpen(false)}
         isRtl={isRtl}
         initialType={universalDocType}
+        recipientCompany={universalDocCompany}
         onAddAuditLog={handleAddAuditLog}
         onShowToast={showToast}
       />

@@ -54,6 +54,7 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
   const [complaintText, setComplaintText] = useState('');
   const [complaintCategory, setComplaintCategory] = useState('حرارة الوجبة والتسليم');
   const [complaintSuccess, setComplaintSuccess] = useState(false);
+  const [submittedTicketId, setSubmittedTicketId] = useState<string | null>(null);
 
   // Quick order simulation state
   const [orderSuccess, setOrderSuccess] = useState<string | null>(null);
@@ -74,6 +75,8 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
     e.preventDefault();
     if (!complaintText.trim()) return;
 
+    const newTicketId = `TKT-${Date.now().toString().slice(-4)}`;
+    setSubmittedTicketId(newTicketId);
     setComplaintSuccess(true);
     setTimeout(() => {
       setComplaintSuccess(false);
@@ -419,17 +422,24 @@ export const CustomerPortalView: React.FC<CustomerPortalViewProps> = ({
         {/* Tab 4: Complaints & Suggestions Form */}
         {activeTab === 'complaints' && (
           <div className="p-5 sm:p-6 space-y-4 text-xs">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white">تقديم شكوى أو اقتراح مباشر لإدارة كاترينج مصر</h4>
                 <p className="text-slate-500">متابعة فورية خلال 30 دقيقة من مدير العمليات ومسؤول الجودة</p>
               </div>
+              <button
+                type="button"
+                onClick={onOpenSupport}
+                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-orange-50 dark:hover:bg-slate-700 text-orange-600 font-bold text-xs border border-slate-200 dark:border-slate-700 cursor-pointer"
+              >
+                فتح طلب مساندة / عرض تشغيل مباشر
+              </button>
             </div>
 
-            {complaintSuccess && (
+            {complaintSuccess && submittedTicketId && (
               <div className="p-3 rounded-xl bg-emerald-600 text-white font-bold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>تم إرسال تذكرتك بنجاح برقم {`TKT-${Date.now().toString().slice(-4)}`}. سيتم التواصل معك فوراً.</span>
+                <span>تم إرسال تذكرتك بنجاح برقم {submittedTicketId}. سيتم التواصل معك فوراً.</span>
               </div>
             )}
 

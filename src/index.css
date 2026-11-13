@@ -5,31 +5,67 @@
 :root {
   --font-arabic: 'Cairo', system-ui, sans-serif;
   --font-latin: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --basit-purple: #852BEB;
+  --basit-purple-deep: #5B18B0;
+  --basit-purple-ink: #2A1459;
+  --basit-yellow: #F4E600;
+  --basit-pearl: #FFFEFC;
+  --basit-surface: #F8F7FB;
+  --basit-border: #ECE7F6;
 }
 
 body {
   font-family: var(--font-arabic);
+  background-color: var(--basit-pearl);
+  color: #1A132B;
+}
+
+.dark body {
+  background-color: #120D1D;
+  color: #FAF8FF;
 }
 
 [dir="ltr"] body, [dir="ltr"] {
   font-family: var(--font-latin);
 }
 
-/* Serrated coupon effect borders for promotional cards */
-.serrated-edge-right {
+.basit-porcelain-card {
+  background: linear-gradient(160deg, #FFFFFF 0%, #FFFEFC 60%, #F8F5FF 100%);
+  border: 1px solid #ECE7F6;
+  box-shadow: 0 10px 30px -14px rgba(133, 43, 235, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.dark .basit-porcelain-card {
+  background: linear-gradient(160deg, #1C152B 0%, #161024 100%);
+  border: 1px solid rgba(133, 43, 235, 0.28);
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55);
+}
+
+/* Serrated coupon voucher borders matching pearl-white / dark background */
+.ce-coupon-notch {
   position: relative;
 }
-.serrated-edge-right::after {
+.ce-coupon-notch::before,
+.ce-coupon-notch::after {
   content: '';
   position: absolute;
-  top: 0;
-  bottom: 0;
-  right: -8px;
-  width: 16px;
-  background-image: radial-gradient(circle at 100% 50%, transparent 8px, currentColor 8px);
-  background-size: 16px 20px;
-  background-repeat: repeat-y;
-  pointer-events: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background-color: #FFFEFC;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+.dark .ce-coupon-notch::before,
+.dark .ce-coupon-notch::after {
+  background-color: #120D1D;
+}
+.ce-coupon-notch::before {
+  left: -10px;
+}
+.ce-coupon-notch::after {
+  right: -10px;
 }
 
 /* Custom scrollbars */
@@ -41,33 +77,82 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.4);
+  background: rgba(133, 43, 235, 0.24);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(249, 115, 22, 0.6);
+  background: rgba(133, 43, 235, 0.65);
 }
 
-/* Print Stylesheet for Official A4 Documents */
+/* Isolated Official A4 Print Stylesheet — Prevents Modal Clipping & Splits Tables Cleanly */
 @media print {
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-  header, footer, nav, button, [class*="print:hidden"] {
-    display: none !important;
-  }
-  #printable-official-document {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 15mm !important;
-    box-shadow: none !important;
-    border: none !important;
-  }
   @page {
     size: A4 portrait;
     margin: 10mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* When printing a modal official document, hide the main app root and show only #ce-print-portal */
+  body.ce-printing-portal #root {
+    display: none !important;
+  }
+
+  body.ce-printing-portal #ce-print-portal {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  #ce-print-portal .ce-a4-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 6mm 8mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  #ce-print-portal .ce-a4-page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  #ce-print-portal table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  #ce-print-portal thead {
+    display: table-header-group;
+  }
+
+  #ce-print-portal tr,
+  #ce-print-portal .ce-keep-together {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print\:hidden {
+    display: none !important;
   }
 }
 
@@ -94,7 +179,7 @@ body {
   display: flex;
   width: max-content;
   will-change: transform;
-  animation: ce-marquee-ltr 32s linear infinite;
+  animation: ce-marquee-ltr 34s linear infinite;
 }
 
 [dir="rtl"] .ce-marquee-track {
@@ -112,3 +197,40 @@ body {
   }
 }
 
+/* Gentle luxury splash animation */
+@keyframes ce-splash-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes ce-splash-fade-up {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.ce-splash-float {
+  animation: ce-splash-float 4.2s ease-in-out infinite;
+}
+
+.ce-splash-fade {
+  animation: ce-splash-fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ce-splash-float,
+  .ce-splash-fade {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

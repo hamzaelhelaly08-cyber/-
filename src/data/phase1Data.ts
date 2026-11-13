@@ -6,7 +6,7 @@ import offersStripImg from '../assets/images/strip_catering_offers_1794519256900
 import cateringVipSpreadImg from '../assets/images/catering_vip_spread_1794513442775.jpg';
 
 export type LanguageCode = 'ar' | 'en';
-export type CountryCode = 'EG' | 'AE' | 'SA' | 'OM';
+export type CountryCode = 'EG' | 'AE' | 'GB' | 'SA' | 'OM';
 
 export interface CountryOption {
   code: CountryCode;
@@ -15,6 +15,7 @@ export interface CountryOption {
   nameEn: string;
   currencyAr: string;
   currencyEn: string;
+  isFeatured?: boolean;
 }
 
 export const SUPPORTED_COUNTRIES: CountryOption[] = [
@@ -25,14 +26,25 @@ export const SUPPORTED_COUNTRIES: CountryOption[] = [
     nameEn: 'Egypt',
     currencyAr: 'ج.م',
     currencyEn: 'EGP',
+    isFeatured: true,
   },
   {
     code: 'AE',
     dialCode: '+971',
-    nameAr: 'الإمارات العربية المتحدة',
-    nameEn: 'United Arab Emirates',
+    nameAr: 'دبي، الإمارات العربية المتحدة',
+    nameEn: 'Dubai, UAE',
     currencyAr: 'د.إ',
     currencyEn: 'AED',
+    isFeatured: true,
+  },
+  {
+    code: 'GB',
+    dialCode: '+44',
+    nameAr: 'المملكة المتحدة',
+    nameEn: 'United Kingdom',
+    currencyAr: 'ج.إ',
+    currencyEn: 'GBP',
+    isFeatured: true,
   },
   {
     code: 'SA',
@@ -41,6 +53,7 @@ export const SUPPORTED_COUNTRIES: CountryOption[] = [
     nameEn: 'Saudi Arabia',
     currencyAr: 'ر.س',
     currencyEn: 'SAR',
+    isFeatured: false,
   },
   {
     code: 'OM',
@@ -49,6 +62,7 @@ export const SUPPORTED_COUNTRIES: CountryOption[] = [
     nameEn: 'Sultanate of Oman',
     currencyAr: 'ر.ع',
     currencyEn: 'OMR',
+    isFeatured: false,
   },
 ];
 
@@ -637,12 +651,12 @@ export const PHASE1_AUDIT_REPORT: Phase1VerificationItem[] = [
 
 export const PHASE1_I18N = {
   ar: {
-    brandName: 'كاترينج مصر',
-    brandSub: 'الشركة الوطنية اللوجستية',
-    officialLogoPlaceholder: 'مساحة الشعار الرسمي',
-    uploadLogoHint: 'رفع الشعار',
+    brandName: 'BASIT | بسيط',
+    brandSub: 'المنصة الدولية للتجارة والمطاعم واللوجستيات والفرص',
+    officialLogoPlaceholder: 'مساحة الشعار المركزي — BASIT',
+    uploadLogoHint: 'رفع أو استبدال الشعار',
     resetLogo: 'إعادة ضبط',
-    searchPlaceholder: 'ابحث في العروض، المطابخ، الوجبات، الفواتير...',
+    searchPlaceholder: 'ابحث في المطاعم، المتاجر، العروض، التوصيل، الفواتير...',
     scopes: {
       all: 'الكل',
       offers: 'العروض',
@@ -656,23 +670,23 @@ export const PHASE1_I18N = {
       home: 'الرئيسية',
       services: 'الخدمات',
       kitchens: 'المطابخ',
-      admin: 'الإدارة والصلاحيات',
-      enterpriseLegacy: 'بوابة ERP المتقدمة',
+      admin: 'الحساب والإدارة',
+      enterpriseLegacy: 'بوابة الأنظمة المؤسسية',
     },
-    heroBadge: 'منظومة الإعاشة والتموين الغذائي الموحدة',
-    heroTitle: 'تغذية المصانع والشركات والضيافة بمعايير احترافية',
+    heroBadge: 'BASIT | بسيط — المنصة الدولية المتكاملة',
+    heroTitle: 'اكتشف المطاعم والتجارة والتوصيل والفرص في منصة عالمية واحدة',
     heroDesc:
-      'منصة متكاملة لإدارة طلبات الإعاشة، عروض الوجبات اليومية، المطابخ المركزية، وتنظيم المناسبات والولائم في منظومة موحدة متجاوبة.',
-    heroPrimaryCta: 'اطلب عرض سعر',
-    heroSecondaryCta: 'تصفح المطابخ المركزية',
+      'تجربة رقمية حديثة تجمع بين المطاعم والضيافة، الأسواق والمتاجر، العروض والقسائم، شبكة التوصيل، الفرص الاستثمارية والانتفاع، وإدارة المطابخ المركزية في مصر ودبي والمملكة المتحدة.',
+    heroPrimaryCta: 'استكشف المنصة والعالم التجاري',
+    heroSecondaryCta: 'المطابخ المركزية الثلاثة',
     servicesHeading: 'الخدمات الأساسية',
-    servicesSubheading: 'اختر الخدمة المطلوبة للانتقال الفوري إلى الشاشة المتخصصة',
+    servicesSubheading: 'اختر أي خدمة بالأيقونات ثلاثية الأبعاد للانتقال الفوري إلى مساحتها',
     galleryHeading: 'جولة مصورة في خدماتنا ومطابخنا',
     galleryHint: 'اسحب لليمين أو اليسار أو اضغط على أي بطاقة لفتح قسمها',
     kitchensHeading: 'المطابخ المركزية المعتمدة',
     kitchensSubheading: 'ثلاثة مطابخ مركزية متكاملة بتغطية جغرافية منظمة',
     awaitingApproval: 'بانتظار اعتماد البيانات',
-    hqLabel: 'المقر الرئيسي للشركة',
+    hqLabel: 'المقر الرئيسي للتشغيل',
     locationLabel: 'الموقع',
     coverageLabel: 'نطاق الخدمة الفعلي',
     servicesOfferedLabel: 'الخدمات المتوفرة',
@@ -691,23 +705,23 @@ export const PHASE1_I18N = {
     notificationsTitle: 'الإشعارات والتنبيهات',
     notificationsScopedBy: 'معروضة وفق صلاحية الحساب الحالي:',
     noNotifications: 'لا توجد تنبيهات مصرح بها لهذا الدور حالياً.',
-    supportFloatingTitle: 'مركز الدعم والمحادثة',
-    supportWelcome: 'مرحباً بك في مركز دعم CATERING EGYPT. أرسل استفسارك أو طلبك ليتم تسجيله ومراجعته.',
+    supportFloatingTitle: 'مركز الدعم ومساعد BASIT',
+    supportWelcome: 'مرحباً بك في مركز دعم BASIT | بسيط. أرسل استفسارك أو طلبك ليتم تسجيله ومراجعته.',
     supportSend: 'إرسال رسالة الدعم',
     quoteModalTitle: 'نموذج طلب عرض سعر رسمي',
     joinKitchenTitle: 'طلب انضمام كمطبخ مركزي',
     roleSwitcherLabel: 'مستوى الصلاحية النشط',
-    footerBrand: 'CATERING EGYPT',
-    footerRights: 'ضمن منظومة الشركة الوطنية اللوجستية',
+    footerBrand: 'BASIT | بسيط',
+    footerRights: 'منصة التجارة والمطاعم والضيافة والتوصيل والفرص الدولية',
     illustrativePhotoNote: 'صورة توضيحية تعبّر عن بيئة التشغيل — بانتظار اعتماد الصور الميدانية الرسمية',
   },
   en: {
-    brandName: 'CATERING EGYPT',
-    brandSub: 'National Logistics Company',
-    officialLogoPlaceholder: 'Official Logo Space',
-    uploadLogoHint: 'Upload Logo',
+    brandName: 'BASIT',
+    brandSub: 'Global Commerce, Dining, Delivery & Opportunities Platform',
+    officialLogoPlaceholder: 'Central Brand Logo Slot',
+    uploadLogoHint: 'Upload or Replace Logo',
     resetLogo: 'Reset',
-    searchPlaceholder: 'Search offers, kitchens, meals, invoices...',
+    searchPlaceholder: 'Search dining, markets, offers, delivery, invoices...',
     scopes: {
       all: 'All',
       offers: 'Offers',
@@ -721,23 +735,23 @@ export const PHASE1_I18N = {
       home: 'Home',
       services: 'Services',
       kitchens: 'Kitchens',
-      admin: 'Account & Governance',
+      admin: 'Account & Admin',
       enterpriseLegacy: 'Enterprise Systems',
     },
-    heroBadge: 'Unified Catering & Food Logistics Platform',
-    heroTitle: 'Corporate, Industrial & Hospitality Catering at Scale',
+    heroBadge: 'BASIT Global Digital Platform',
+    heroTitle: 'Dining, Commerce, Delivery & Opportunities in One Luminous Platform',
     heroDesc:
-      'An integrated mobile-first platform managing corporate catering orders, daily meal plans, central kitchens, and event banquets with clear data governance.',
-    heroPrimaryCta: 'Request Quotation',
-    heroSecondaryCta: 'Explore Central Kitchens',
+      'An international multi-market platform uniting curated dining & hospitality, retail markets, promotional coupons, delivery & courier networks, partner workspaces, usufruct opportunities, and central kitchens across Egypt, Dubai, and the UK.',
+    heroPrimaryCta: 'Explore Dining & Experiences',
+    heroSecondaryCta: 'Central Kitchens',
     servicesHeading: 'Core Services',
-    servicesSubheading: 'Select any 3D service icon to open its dedicated section',
+    servicesSubheading: 'Select any 3D service icon to open its dedicated portal',
     galleryHeading: 'Central Kitchens & Services Showcase',
     galleryHint: 'Auto-scrolling continuous photo strip — swipe or tap any photo to open its section',
     kitchensHeading: 'Approved Central Kitchens',
     kitchensSubheading: 'Three dedicated regional central kitchens with defined coverage',
     awaitingApproval: 'Awaiting Data Approval',
-    hqLabel: 'Company Headquarters',
+    hqLabel: 'Operations Headquarters',
     locationLabel: 'Location',
     coverageLabel: 'Active Service Coverage',
     servicesOfferedLabel: 'Available Services',
@@ -756,14 +770,14 @@ export const PHASE1_I18N = {
     notificationsTitle: 'Notifications',
     notificationsScopedBy: 'Filtered by active user role permissions:',
     noNotifications: 'No authorized notifications for this role yet.',
-    supportFloatingTitle: 'AI Assistant & Support',
-    supportWelcome: 'Welcome to CATERING EGYPT AI & Support Center. Ask a question or submit your inquiry.',
+    supportFloatingTitle: 'BASIT Support & Assistance',
+    supportWelcome: 'Welcome to BASIT Support Center. Ask a question or submit your request directly.',
     supportSend: 'Send Inquiry',
     quoteModalTitle: 'Official Quotation Request Form',
     joinKitchenTitle: 'Join as a Central Kitchen',
     roleSwitcherLabel: 'Active Permission Role',
-    footerBrand: 'CATERING EGYPT',
-    footerRights: 'Part of National Logistics Company System',
+    footerBrand: 'BASIT | بسيط',
+    footerRights: 'Global Platform for Dining, Commerce, Delivery & Opportunities',
     illustrativePhotoNote: 'Illustrative operational photo — awaiting official on-site photography approval',
   },
 };

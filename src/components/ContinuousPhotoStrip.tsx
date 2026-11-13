@@ -89,7 +89,7 @@ export const ContinuousPhotoStrip: React.FC<ContinuousPhotoStripProps> = ({
           <button
             type="button"
             onClick={() => scrollByStep('prev')}
-            className="w-9 h-9 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-[#FF6B00] text-slate-800 dark:text-white flex items-center justify-center shadow-xs cursor-pointer transition-colors"
+            className="w-9 h-9 rounded-xl bg-white dark:bg-[#221738] border border-[#ECE7F6] dark:border-[#852BEB]/30 hover:border-[#852BEB] text-[#1A132B] dark:text-white flex items-center justify-center shadow-xs cursor-pointer transition-colors"
             aria-label="Scroll Previous"
           >
             {isRtl ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -97,7 +97,7 @@ export const ContinuousPhotoStrip: React.FC<ContinuousPhotoStripProps> = ({
           <button
             type="button"
             onClick={() => scrollByStep('next')}
-            className="w-9 h-9 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-[#FF6B00] text-slate-800 dark:text-white flex items-center justify-center shadow-xs cursor-pointer transition-colors"
+            className="w-9 h-9 rounded-xl bg-white dark:bg-[#221738] border border-[#ECE7F6] dark:border-[#852BEB]/30 hover:border-[#852BEB] text-[#1A132B] dark:text-white flex items-center justify-center shadow-xs cursor-pointer transition-colors"
             aria-label="Scroll Next"
           >
             {isRtl ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -105,7 +105,7 @@ export const ContinuousPhotoStrip: React.FC<ContinuousPhotoStripProps> = ({
         </div>
       </div>
 
-      {/* Pure Independent Auto-Scrolling & Drag-Swipeable Photo Strip (ZERO text inside photo frames) */}
+      {/* Pure Independent Auto-Scrolling & Drag-Swipeable Photo Strip */}
       <div
         ref={scrollerRef}
         onPointerDown={onPointerDown}
@@ -136,7 +136,7 @@ export const ContinuousPhotoStrip: React.FC<ContinuousPhotoStripProps> = ({
               }}
               title={isRtl ? slide.altAr : slide.altEn}
               aria-label={isRtl ? slide.altAr : slide.altEn}
-              className="group relative shrink-0 w-72 sm:w-80 h-44 sm:h-48 rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:shadow-orange-500/20 focus:outline-none focus:ring-2 focus:ring-[#FF6B00] cursor-pointer transition-transform duration-200 hover:scale-[1.02] bg-orange-50 dark:bg-slate-800"
+              className="group relative shrink-0 w-72 sm:w-80 h-44 sm:h-48 rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:shadow-[#852BEB]/20 focus:outline-none focus:ring-2 focus:ring-[#852BEB] cursor-pointer transition-transform duration-200 hover:scale-[1.02] bg-[#F8F5FF] dark:bg-[#221738]"
             >
               <img
                 src={slide.imageUrl}

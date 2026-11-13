@@ -26,6 +26,8 @@ import {
   HeartHandshake
 } from 'lucide-react';
 import { openGooglePicker, PickedFile } from '../lib/googlePicker';
+import heroMobileImg from '../assets/images/catering_mobile_hero_1794418651611.jpg';
+import heroDesktopImg from '../assets/images/catering_hero_commercial_1794418634522.jpg';
 
 interface FullBleedAdvertisingHeroProps {
   isRtl: boolean;
@@ -102,10 +104,10 @@ export const FullBleedAdvertisingHero: React.FC<FullBleedAdvertisingHeroProps> =
         <picture className="w-full h-full">
           <source 
             media="(max-width: 768px)" 
-            srcSet="/src/assets/images/catering_mobile_hero_1794418651611.jpg" 
+            srcSet={heroMobileImg} 
           />
           <img 
-            src="/src/assets/images/catering_hero_commercial_1794418634522.jpg" 
+            src={heroDesktopImg} 
             alt="CATERING EGYPT Commercial Advertisement" 
             className="w-full h-full object-cover object-center lg:object-right filter brightness-90 contrast-105"
           />

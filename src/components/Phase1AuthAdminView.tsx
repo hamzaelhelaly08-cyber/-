@@ -55,6 +55,7 @@ interface Phase1AuthAdminViewProps {
   activityLog: Phase1ActivityItem[];
   onLogAccountRegistration: (type: 'individual' | 'corporate', label: string) => void;
   onOpenSubmodule: (key: UnifiedSubmoduleKey) => void;
+  onOpenFaydEcosystem?: () => void;
   onBackHome: () => void;
 }
 
@@ -69,6 +70,7 @@ export const Phase1AuthAdminView: React.FC<Phase1AuthAdminViewProps> = ({
   activityLog,
   onLogAccountRegistration,
   onOpenSubmodule,
+  onOpenFaydEcosystem,
   onBackHome,
 }) => {
   const isRtl = lang === 'ar';
@@ -186,7 +188,7 @@ export const Phase1AuthAdminView: React.FC<Phase1AuthAdminViewProps> = ({
 
   return (
     <div className="space-y-6 pb-12">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <button
           type="button"
           onClick={onBackHome}
@@ -195,6 +197,17 @@ export const Phase1AuthAdminView: React.FC<Phase1AuthAdminViewProps> = ({
           <BackIcon className="w-4 h-4 text-[#FF6B00]" />
           <span>{t.nav.home}</span>
         </button>
+
+        {onOpenFaydEcosystem && (
+          <button
+            type="button"
+            onClick={onOpenFaydEcosystem}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF6B00] hover:bg-orange-600 text-white text-xs font-extrabold shadow-sm cursor-pointer"
+          >
+            <ArrowUpRight className="w-4 h-4" />
+            <span>{isRtl ? 'فتح منظومة FAYD التجارية والانتفاع' : 'Open FAYD Commercial Ecosystem'}</span>
+          </button>
+        )}
       </div>
 
       {/* Unified Internal Systems Hub (No Legacy Interface Jump!) */}
